@@ -1,0 +1,141 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>18才意識調査（データ出典: 日本財団）</title>
+</head><body>
+<h1 id=title></h1>
+
+<div id=divsels></div>
+<div id=divpie></div>
+<hr>
+「<a href=https://www.nippon-foundation.or.jp/who/news/pr/2019/20191130-38555.html>日本財団「18歳意識調査」第20回 テーマ：「国や社会に対する意識」（9カ国調査） | 日本財団</a>」を加工して作成
+ → <a href=./data/age18-forourcountry-2019.csv>CSVデータ</a>
+ (<a href="https://github.com/code4fukui/age18/">src on GitHub by Code for FUKUI</a>)<br>
+
+<script type="module">
+import { ChartPie } from "https:js.sabae.cc/Chart.js";
+import { CSV } from "https://js.sabae.cc/CSV.js";
+import { ArrayUtil } from "https://js.sabae.cc/ArrayUtil.js";
+
+title.textContent = document.title;
+
+const url = "./data/age18-forourcountry-2019.csv";
+const data = CSV.toJSON(await CSV.fetch(url));
+const csv = [];
+for (const line of data) {
+  for (const name in line) {
+    if (name == "国" || name == "性別") {
+      continue;
+    }
+    csv.push({ 国: line.国, 性別: line.性別, 項目: name, 数: 500 * parseFloat(line[name]) / 100 });
+  }
+}
+console.log(csv);
+
+const names = "国,性別,項目".split(",");
+
+const show = () => {
+  divpie.innerHTML = "";
+
+  const node2array = (nodes) => {
+    const res = [];
+    for (const n of nodes) {
+      res.push(n);
+    }
+    return res;
+  };
+  const keys = {};
+  node2array(divsels.querySelectorAll("select")).forEach(s => {
+    keys[s.dataname] = s.value;
+  });
+  console.log(keys);
+
+  const addChart = (name, data) => {
+    const div = document.createElement("div");
+    div.style.display = "inline-block";
+    const title = document.createElement("span");
+    title.textContent = name;
+    div.appendChild(title);
+    div.appendChild(document.createElement("br"))
+    div.appendChild(new ChartPie(data));
+    divpie.appendChild(div);
+  };
+
+  const csv2 = csv.filter(c => {
+    for (const key in keys) {
+      if (keys[key]) {
+        if (c[key] != keys[key]) {
+          return false;
+        }
+      }
+    }
+    return true;
+  });
+
+  if (!csv2.length) {
+    return;
+  }
+
+  if (!keys["国"] && !keys["性別"]) {
+    for (const country of ["日本", "アメリカ", "中国"]) {
+      const data = {};
+      for (const d of csv2) {
+        if (d.国 != country) {
+          continue;
+        }
+        const v = d.性別;
+        if (!data[v]) {
+          data[v] = parseFloat(d.数);
+        } else {
+          data[v] += parseFloat(d.数);
+        }
+      }
+      if (Object.keys(data).length > 0) {
+        addChart(country, data);
+      }
+    }
+  }
+
+  for (const name of names) {
+    const data = {};
+    for (const d of csv2) {
+      const v = d[name];
+      if (!data[v]) {
+        data[v] = parseFloat(d.数);
+      } else {
+        data[v] += parseFloat(d.数);
+      }
+    }
+    addChart(name, data);
+  }
+};
+
+const cr = (tag) => document.createElement(tag);
+
+const sels = names;
+for (const sel of sels) {
+  const names = ArrayUtil.toUnique(csv.map(a => a[sel]));
+  const s = cr("select");
+  s.appendChild(cr("option"));
+  names.forEach(name => {
+    const opt = cr("option");
+    opt.textContent = name;
+    s.appendChild(opt);
+  });
+  divsels.appendChild(s);
+  s.dataname = sel;
+  s.onchange = show;
+}
+
+show();
+</script>
+
+<style>
+body {
+  text-align: center;
+  font-family: sans-serif;
+}
+textarea {
+  width: 70vw;
+  height: 8em;
+}
+</style>
+
