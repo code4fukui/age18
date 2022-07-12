@@ -74,7 +74,7 @@ const show = () => {
     return;
   }
 
-  if (!keys["国"] && !keys["性別"]) {
+  if (!keys["国"] && !keys["性別"] && keys["項目"]) {
     for (const country of ["日本", "アメリカ", "中国"]) {
       const data = {};
       for (const d of csv2) {
