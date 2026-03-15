@@ -1,6 +1,8 @@
 # age18
 
-One-sentence description: Visualization of a survey on the consciousness of 18-year-olds in different countries.
+> 日本語のREADMEはこちらです: [README.ja.md](README.ja.md)
+
+Visualization of a survey on the consciousness of 18-year-olds in different countries.
 
 ## Demo
 https://code4fukui.github.io/age18/
