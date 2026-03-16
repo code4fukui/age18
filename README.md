@@ -16,4 +16,4 @@ https://code4fukui.github.io/age18/
 The data is sourced from the "18-year-old Consciousness Survey" conducted by the Nippon Foundation.
 
 ## License
-This project is licensed under the MIT License.
+MIT License — see [LICENSE](LICENSE).
